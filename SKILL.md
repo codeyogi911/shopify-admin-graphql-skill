@@ -14,7 +14,7 @@ description: >
 # Shopify Admin GraphQL
 
 Generate and validate GraphQL operations against the Shopify Admin API.
-For the full schema reference, see the [common patterns](reference.md).
+For the full schema reference, see the [common patterns](references/reference.md).
 
 ## API Basics
 
@@ -100,7 +100,7 @@ query ListMutations {
 
 After running introspection and discovering useful patterns:
 
-1. Read `reference.md` in this skill directory
+1. Read `references/reference.md` in this skill directory
 2. Append the new patterns (queries, mutations, input types) to the appropriate section
 3. Keep the format consistent with existing entries
 
@@ -166,6 +166,6 @@ const { data } = await response.json();
 
 For complete query/mutation examples, field lists, filter syntax, and input types:
 
-- See [reference.md](reference.md) for embedded patterns
+- See [references/reference.md](references/reference.md) for embedded patterns
 - See https://shopify.dev/docs/api/admin-graphql/2026-01 for full docs
-- Run targeted introspection to discover fields not in reference.md
+- Run targeted introspection to discover fields not in references/reference.md
