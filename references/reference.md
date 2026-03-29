@@ -601,4 +601,247 @@ Common topics: `ORDERS_CREATE`, `ORDERS_UPDATED`, `PRODUCTS_CREATE`, `PRODUCTS_U
 
 ---
 
+## Blogs & Articles
+
+### List blogs
+
+```graphql
+query ListBlogs($first: Int!, $after: String) {
+  blogs(first: $first, after: $after) {
+    edges {
+      node {
+        id
+        title
+        handle
+        commentPolicy
+        articlesCount { count }
+        createdAt
+      }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+```
+
+**Sort keys**: `HANDLE`, `ID`, `TITLE`
+
+### Get single blog with articles
+
+```graphql
+query GetBlog($id: ID!, $first: Int!) {
+  blog(id: $id) {
+    id
+    title
+    handle
+    commentPolicy
+    templateSuffix
+    tags
+    articles(first: $first) {
+      edges {
+        node {
+          id
+          title
+          handle
+          isPublished
+          publishedAt
+          author { name }
+          tags
+        }
+      }
+      pageInfo { hasNextPage endCursor }
+    }
+  }
+}
+```
+
+### Create blog
+
+```graphql
+mutation CreateBlog($blog: BlogCreateInput!) {
+  blogCreate(blog: $blog) {
+    blog {
+      id
+      title
+      handle
+      commentPolicy
+    }
+    userErrors { code field message }
+  }
+}
+```
+
+**Variables example**:
+```json
+{
+  "blog": {
+    "title": "Brew Guides",
+    "handle": "brew-guides",
+    "commentPolicy": "MODERATED"
+  }
+}
+```
+
+**CommentPolicy enum**: `AUTO_PUBLISHED`, `CLOSED`, `MODERATED`
+
+### Update blog
+
+```graphql
+mutation UpdateBlog($id: ID!, $blog: BlogUpdateInput!) {
+  blogUpdate(id: $id, blog: $blog) {
+    blog { id title handle commentPolicy }
+    userErrors { code field message }
+  }
+}
+```
+
+### Delete blog
+
+```graphql
+mutation DeleteBlog($id: ID!) {
+  blogDelete(id: $id) {
+    deletedBlogId
+    userErrors { code field message }
+  }
+}
+```
+
+### List articles
+
+```graphql
+query ListArticles($first: Int!, $after: String, $query: String) {
+  articles(first: $first, after: $after, query: $query) {
+    edges {
+      node {
+        id
+        title
+        handle
+        isPublished
+        publishedAt
+        author { name }
+        blog { id title }
+        tags
+        summary
+      }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+```
+
+**Filter examples** (`query` variable):
+- `blog_id:123` — articles in a specific blog
+- `author:Jane` — by author name
+- `tag:coffee` — by tag
+- `published_status:published` / `published_status:unpublished`
+- `created_at:>2024-01-01` — after date
+- `title:*espresso*` — title contains
+
+**Sort keys**: `AUTHOR`, `BLOG_TITLE`, `ID`, `PUBLISHED_AT`, `TITLE`, `UPDATED_AT`
+
+### Get single article
+
+```graphql
+query GetArticle($id: ID!) {
+  article(id: $id) {
+    id
+    title
+    handle
+    body
+    summary
+    author { name }
+    blog { id title }
+    image { url altText }
+    isPublished
+    publishedAt
+    tags
+    createdAt
+    updatedAt
+    templateSuffix
+    seo { title description }
+  }
+}
+```
+
+### Create article (publish a blog post)
+
+```graphql
+mutation CreateArticle($article: ArticleCreateInput!) {
+  articleCreate(article: $article) {
+    article {
+      id
+      title
+      handle
+      isPublished
+      publishedAt
+    }
+    userErrors { code field message }
+  }
+}
+```
+
+**Variables example**:
+```json
+{
+  "article": {
+    "title": "How to Brew the Perfect V60",
+    "author": { "name": "Fix Coffee" },
+    "blogId": "gid://shopify/Blog/123",
+    "body": "<h2>What You Need</h2><p>A V60 dripper, filters, freshly ground coffee...</p>",
+    "summary": "A step-by-step guide to brewing with the Hario V60.",
+    "handle": "how-to-brew-perfect-v60",
+    "tags": ["brewing", "v60", "pour-over"],
+    "isPublished": true,
+    "publishDate": "2026-03-29T10:00:00Z",
+    "image": {
+      "url": "https://cdn.shopify.com/...",
+      "altText": "V60 brewing setup"
+    }
+  }
+}
+```
+
+You can also create a new blog inline by passing the `blog` argument instead of `blogId`:
+```graphql
+mutation CreateArticleWithNewBlog($article: ArticleCreateInput!, $blog: ArticleBlogInput) {
+  articleCreate(article: $article, blog: $blog) {
+    article { id title blog { id title } }
+    userErrors { code field message }
+  }
+}
+```
+
+### Update article
+
+```graphql
+mutation UpdateArticle($id: ID!, $article: ArticleUpdateInput!) {
+  articleUpdate(id: $id, article: $article) {
+    article {
+      id
+      title
+      handle
+      isPublished
+      publishedAt
+    }
+    userErrors { code field message }
+  }
+}
+```
+
+**Key fields**: `title`, `body`, `summary`, `handle`, `author`, `blogId` (move to different blog), `image`, `isPublished`, `publishDate`, `tags`, `templateSuffix`, `metafields`, `redirectNewHandle` (creates URL redirect from old handle).
+
+### Delete article
+
+```graphql
+mutation DeleteArticle($id: ID!) {
+  articleDelete(id: $id) {
+    deletedArticleId
+    userErrors { code field message }
+  }
+}
+```
+
+**Required scopes**: All blog and article mutations need `write_content` or `write_online_store_pages`.
+
+---
+
 *To add new patterns: run a targeted introspection query, then append the results below.*
