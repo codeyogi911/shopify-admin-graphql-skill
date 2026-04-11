@@ -14,19 +14,19 @@ description: >
 # Shopify Admin GraphQL
 
 Generate and validate GraphQL operations against the Shopify Admin API.
-For the full schema reference, see the [common patterns](references/reference.md).
+Topic-scoped patterns live under [references/](references/reference.md) — start at the index and open only the files you need.
 
 ## API Basics
 
-- **Endpoint**: `POST https://{shop}.myshopify.com/admin/api/2026-01/graphql.json`
+- **Endpoint**: `POST https://{shop}.myshopify.com/admin/api/2026-04/graphql.json`
 - **Auth header**: `X-Shopify-Access-Token: {token}`
-- **Latest stable version**: `2026-01`
+- **Latest stable version**: `2026-04`
 - **All connections use cursor-based pagination** (`first`/`after`, `last`/`before`)
 - **Mutations return `userErrors`** — always request them; a 200 status does not mean success
 
 ## Schema Discovery via Introspection
 
-When you need to discover fields, arguments, or types not covered in [reference.md](reference.md), run a GraphQL introspection query against the store.
+When you need to discover fields, arguments, or types not covered in the [reference index](references/reference.md), run a GraphQL introspection query against the store.
 
 ### Full schema introspection (heavy — use sparingly)
 
@@ -100,9 +100,9 @@ query ListMutations {
 
 After running introspection and discovering useful patterns:
 
-1. Read `references/reference.md` in this skill directory
-2. Append the new patterns (queries, mutations, input types) to the appropriate section
-3. Keep the format consistent with existing entries
+1. Open `references/reference.md` (the topic index) to pick the right file.
+2. Append the new patterns (queries, mutations, input types) to the matching topic file.
+3. Keep the format consistent with existing entries.
 
 ## Code Generation Rules
 
@@ -121,7 +121,7 @@ After running introspection and discovering useful patterns:
 
 ```bash
 curl -X POST \
-  https://{shop}.myshopify.com/admin/api/2026-01/graphql.json \
+  https://{shop}.myshopify.com/admin/api/2026-04/graphql.json \
   -H 'Content-Type: application/json' \
   -H 'X-Shopify-Access-Token: {access_token}' \
   -d '{"query": "...", "variables": {}}'
@@ -139,7 +139,7 @@ const response = await client.query({
 ### Direct API Access (embedded apps)
 
 ```typescript
-const response = await fetch('shopify:admin/api/2026-01/graphql.json', {
+const response = await fetch('shopify:admin/api/2026-04/graphql.json', {
   method: 'POST',
   body: JSON.stringify({ query: QUERY_STRING, variables: {} }),
 });
@@ -148,10 +148,16 @@ const { data } = await response.json();
 
 ## Rate Limits
 
-- **Bucket**: 1000 cost points, restores at 50/second
-- **Single query max cost**: 1000
-- Cost is calculated from selected fields (connections cost more)
-- Use `extensions.cost` in responses to monitor usage
+Cost is calculated from selected fields (connections cost more). Limits vary by plan:
+
+| Plan | Bucket size | Restore rate |
+|---|---|---|
+| Standard Shopify | 1,000 | 100 points/sec |
+| Advanced Shopify | 2,000 | 200 points/sec |
+| Shopify Plus | 10,000 | 1,000 points/sec |
+
+- **Single query max cost**: 1,000 points (hard ceiling, all plans)
+- Use `extensions.cost` in responses to monitor actual vs requested cost
 - For bulk data, use [Bulk Operations](https://shopify.dev/docs/api/usage/bulk-operations/queries)
 
 ## Error Handling
@@ -166,6 +172,6 @@ const { data } = await response.json();
 
 For complete query/mutation examples, field lists, filter syntax, and input types:
 
-- See [references/reference.md](references/reference.md) for embedded patterns
-- See https://shopify.dev/docs/api/admin-graphql/2026-01 for full docs
-- Run targeted introspection to discover fields not in references/reference.md
+- See [references/reference.md](references/reference.md) — topic index pointing at `catalog.md`, `sales.md`, `customers.md`, `inventory.md`, `logistics.md`, `b2b.md`, `marketing.md`, `content.md`, `analytics.md`, `platform.md`
+- See https://shopify.dev/docs/api/admin-graphql/2026-04 for full docs
+- Run targeted introspection to discover fields not in the topic files
